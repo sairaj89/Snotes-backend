@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const noteRoutes = require("./routes/noteRoutes");
 
+// Load environment variables
 dotenv.config();
 
 // Connect to MongoDB
@@ -13,24 +14,31 @@ const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json()); // Instead of body-parser
+app.use(express.json()); // Built-in body parser for JSON
 
-// Health Check Route
+// Root Route - Health Check
 app.get("/", (req, res) => {
-  res.send("API is running...");
+  res.status(200).json({ message: "SNotes API is running 🚀" });
 });
 
-// Routes
+// Notes API Routes
 app.use("/api/notes", noteRoutes);
 
-// Error Handler (optional)
+// 404 Not Found Middleware
+app.use((req, res, next) => {
+  res.status(404).json({ message: "Route Not Found" });
+});
+
+// Global Error Handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error("Unhandled Error:", err.stack);
   res.status(500).json({ message: "Internal Server Error" });
 });
 
-// Start the server
+// Start the Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV || "development"} mode on port ${PORT}`);
+  console.log(
+    `✅ Server running in ${process.env.NODE_ENV || "development"} mode on http://localhost:${PORT}`
+  );
 });
